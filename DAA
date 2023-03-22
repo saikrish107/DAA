@@ -1,0 +1,756 @@
+*******mergeklists*******
+
+#include<stdio.h>
+#include<stdlib.h>
+struct ListNode
+{
+    int val;
+    struct ListNode *next;
+};
+struct ListNode* create(struct ListNode *head)
+{
+struct ListNode *new,*prev;
+int x;
+printf("enter data in ascending order,enter -1 to end");
+scanf("%d",&x);
+while(x!=-1)
+{
+new=(struct ListNode*)malloc(sizeof(struct ListNode));
+new->val=x;
+new->next=NULL;
+if(head==NULL)
+{
+head=new;
+prev=new;
+}
+else
+{
+prev->next=new;
+prev=new;
+}
+printf("enter data in ascending order,enter -1 to end");
+scanf("%d",&x);
+}
+return head;
+}
+struct ListNode* mergesort(struct ListNode* l1,struct ListNode* l2)
+ {
+if(l1==NULL && l2==NULL)
+{
+    return NULL;
+}
+else if(l1==NULL)
+{
+    return l2;
+}
+else if(l2==NULL)
+{
+    return l1;
+}
+else
+{
+    struct ListNode l3=(struct ListNode)malloc(sizeof(struct ListNode));
+    struct ListNode *temp1=l1,*temp2=l2;
+    struct ListNode *res=l3;
+    if(temp1->val<temp2->val)
+    {
+        l3->val=temp1->val;
+        temp1=temp1->next;
+    }
+    else{
+        l3->val=temp2->val;
+        temp2=temp2->next;
+    }
+    while(temp1!=NULL && temp2!=NULL)
+{
+    if(temp1->val<=temp2->val)
+    {
+        res->next=temp1;
+        res=temp1;
+        temp1=temp1->next;
+    }
+    else
+    {
+        res->next=temp2;
+        res=temp2;
+        temp2=temp2->next;
+    }
+}
+if(temp1!=NULL)
+{
+    while(temp1!=NULL)
+    {
+        res->next=temp1;
+        res=temp1;
+        temp1=temp1->next;
+    }
+}
+if(temp2!=NULL)
+{
+    while(temp2!=NULL)
+    {
+        res->next=temp2;
+        res=temp2;
+        temp2=temp2->next;
+    }
+}
+return l3;
+ }
+ }
+struct ListNode* mergeKLists(struct ListNode** lists, int listsSize){
+    if(listsSize==0)
+    {
+        return NULL;
+    }
+    else
+    {
+
+    struct ListNode* res=lists[0];
+for(int i=1;i<listsSize;i++)
+{
+    res=mergesort(res,lists[i]);
+}
+return res;
+    }
+}
+void display(struct ListNode *head)
+{
+    struct ListNode* temp=head;
+    printf("[");
+    while(temp!=NULL)
+    {
+        printf("%d,",temp->val);
+        temp=temp->next;
+    }
+    printf("]");
+}
+void main()
+{
+    int listsSize;
+    printf("enter number of lists");
+    scanf("%d",&listsSize);
+    struct ListNode* lists[listsSize];
+    struct ListNode *temp,*res;
+    for(int i=0;i<listsSize;i++)
+    {
+        temp=NULL;
+        temp=create(temp);
+        lists[i]=temp;
+    }
+    res=mergeKLists(lists,listsSize);
+    display(res);
+}
+
+*******min Cost Connect Point******
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<limits.h>
+int min(int dist[],int v[],int pointsSize)
+{
+    int m=INT_MAX,ind;
+    for(int i=0;i<pointsSize;i++)
+    {
+        if(v[i]==0 && dist[i]<m)
+        {
+            m=dist[i];
+            ind=i;
+        }
+    }
+    return ind;
+}
+int minCostConnectPoints(int** points, int pointsSize, int* pointsColSize){
+    int cost[pointsSize][pointsSize],v[1000],dist[pointsSize],u;
+    for(int i=0;i<pointsSize;i++)
+    {
+        v[i]=0;
+        dist[i]=INT_MAX;
+        for(int j=0;j<pointsSize;j++)
+        {
+        if(i!=j)
+        {
+            cost[i][j]=abs(points[i][0]-points[j][0])+abs(points[i][1]-points[j][1]);
+        }
+        else
+        {
+            cost[i][j]=INT_MAX;
+        }
+        }
+    }
+    dist[0]=0;
+    for(int i=0;i<pointsSize;i++)
+    {
+        u=min(dist,v,pointsSize);
+        v[u]=1;
+        for(int j=0;j<pointsSize;j++)
+        {
+            if(cost[u][j]<dist[j] && v[j]==0)
+            {
+                dist[j]=cost[u][j];
+            }
+        }
+    }
+    int s=0;
+    for(int i=0;i<pointsSize;i++)
+    {
+        s+=dist[i];
+
+    }
+    return s;
+}
+void main()
+{
+int pointsSize,x=2;
+int* pointsColSize=&x;
+printf("enter number of points");
+scanf("%d",&pointsSize);
+int** points=(int*)malloc(pointsSize*sizeof(int));
+for(int i=0;i<pointsSize;i++)
+{
+points[i]=(int*)malloc((pointsColSize)(sizeof(int)));
+}
+for(int i=0;i<pointsSize;i++)
+{
+for(int j=0;j<*(pointsColSize);j++)
+{
+scanf("%d",&points[i][j]);
+}
+}
+int cost=minCostConnectPoints(points,pointsSize,pointsColSize);
+printf("minimum cost to connect all points:%d",cost);
+}
+
+********network delay time***********
+
+int networkDelayTime(int** times, int timesSize, int timesColSize, int n, int k){
+    int i,j,u,v,w,r=0;
+    int d[n];
+    for(i=0;i<n;i++)
+    {
+        d[i]=10000;
+    }
+    d[k-1]=0;
+    for(i=0;i<n;i++)
+    {
+        for(j=0;j<timesSize;j++)
+        {
+            u=times[j][0]-1;
+            v=times[j][1]-1;
+            w=times[j][2];
+            d[v]=d[v]<d[u]+w?d[v]:d[u]+w;
+        }
+    }
+    for(i=0;i<n;i++)
+    {
+        if(d[i]==10000)
+        {
+            return -1;
+        }
+        r=r<d[i]?d[i]:r;
+    }
+    return r;
+}
+#include <stdio.h>
+int main()
+{     int r,c,i,j,n,k;
+     printf("enter r c n k");
+    scanf("%d%d%d%d",&r,&c,&n,&k);
+
+    int** arr = (int**)malloc(r*sizeof(int));
+    for (i = 0; i < r; i++)
+       { arr[i] = (int*)malloc(c*sizeof(int));
+       }
+       
+       printf("enter elements");
+    for (i = 0; i < r; i++)
+       {
+           for (j = 0; j < c; j++)
+            scanf("%d",&arr[i][j]);
+       }
+      int p=networkDelayTime(arr,r,c,n,k);
+      printf("%d",p);
+}
+
+*******kmp**********
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+int *failure(char *p)
+{
+    int* f=(int*)malloc(strlen(p)*sizeof(int));
+    f[0]=0;
+    int i=1,j=0;
+    while(i<strlen(p))
+    {
+        if(p[i]==p[j])
+        {
+            f[i]=j+1;
+            i++;
+            j++;
+        }
+        else if(j>0)
+            j=f[j-1];
+        else
+            f[i]=0;
+            i++;
+    }
+    return f;
+}
+int kmp(char *t,char *p)
+{
+    int* f=(int*)malloc(strlen(p)*sizeof(int));
+    f=failure(p);
+    int i=0,j=0;
+    while(i<strlen(t))
+    {
+        if(t[i]==p[j])
+        {
+            if(j==strlen(p)-1)
+                return i-j;
+            else
+            {
+                i++;
+                j++;
+            }
+        }
+        else
+        {
+            if(j>0)
+                j=f[j-1];
+            else
+                i++;
+        }
+    }
+    return -1;
+}
+void main()
+{
+    char t[]="abacaabaccabacabaabb";
+    char p[]="abacab";
+    printf("%d",kmp(t,p));
+}
+
+*********maximum truck size**********
+
+#include<stdio.h>
+#include<stdlib.h>
+int maximumUnits(int** boxTypes, int boxTypesSize, int* boxTypesColSize, int truckSize){
+    int c[10];
+    for(int i=0;i<boxTypesSize-1;i++)
+    {
+        for(int j=0;j<boxTypesSize-i-1;j++)
+        {
+            if(boxTypes[j][1]<boxTypes[j+1][1])
+            {
+                c[0]=boxTypes[j][0];
+                c[1]=boxTypes[j][1];
+                boxTypes[j][0]=boxTypes[j+1][0];
+                boxTypes[j][1]=boxTypes[j+1][1];
+                boxTypes[j+1][0]=c[0];
+                boxTypes[j+1][1]=c[1];
+            }
+        }
+    }
+    int r=0;
+    for(int i=0;i<boxTypesSize;i++)
+    {
+        if(truckSize==0)
+        {
+            break;
+        }
+        if(boxTypes[i][0]<truckSize)
+        {
+            r+=(boxTypes[i][0])*(boxTypes[i][1]);
+            truckSize-=boxTypes[i][0];
+        }
+        else
+        {
+            r+=truckSize*boxTypes[i][1];
+            truckSize=0;
+        }
+
+    }
+   
+    return r;
+}
+ int main()
+{
+    int truckSize;
+    int boxTypesSize;
+    int boxTypesColSize=2;
+    printf("enter boxTypesSize");
+    scanf("%d",&boxTypesSize);
+    int** boxTypes=(int*)malloc(boxTypesSize*sizeof(int));
+    for(int i=0;i<boxTypesSize;i++)
+    {
+       boxTypes[i]=(int*)malloc(boxTypesColSize*sizeof(int));
+    }
+    for(int i=0;i<boxTypesSize;i++)
+    {
+        for(int j=0;j<boxTypesColSize;j++)
+        {
+            scanf("%d",&boxTypes[i][j]);
+        }
+    }
+    printf("enter truck size");
+    scanf("%d",&truckSize);
+    int c=maximumUnits(boxTypes,boxTypesSize,&boxTypesColSize,truckSize);
+    printf("%d",c);
+    return 0;
+}
+
+*********coin change***********
+
+#include <stdio.h>
+int coinChange(int* coins, int coinsSize, int amount){
+int a[amount+1];
+a[0]=0;
+    for(int i=1;i<=amount;i++)
+    {
+        a[i]=amount+1;
+    }
+    for(int i=1;i<=amount;i++)
+    {
+        for(int j=0;j<coinsSize;j++)
+        {
+            if(coins[j]<=i)
+            {
+                int x=1+a[i-coins[j]];
+                int y=a[i];
+                a[i]=x<y?x:y;
+            }
+        }
+    }
+    if(a[amount]==amount+1)
+     return -1;
+    else
+     return a[amount];
+}
+int main()
+{int c[10],n,a;
+printf("enter n and amount");
+scanf("%d%d",&n,&a);
+printf("enter coins");
+for(int i=0;i<n;i++){
+    scanf("%d",&c[i]);
+}
+  int r=coinChange(c,n,a);
+  printf("min coins :%d",r);
+}
+
+**********longest common subsequence.*********
+
+#include<stdio.h>
+#include<string.h>
+#include<stdlib.h>
+int lcs(char c1[],char c2[],int m,int n)
+{
+    int a[n+1][m+1];
+    for(int i=0;i<m+1;i++)
+        a[0][i]=0;
+    for(int j=0;j<n+1;j++)
+        a[j][0]=0;
+    for(int i=0;i<n;i++)
+    {
+        for(int j=0;j<m;j++)
+        {
+            if(c2[i]==c1[j])
+            {
+                a[i+1][j+1]=a[i][j]+1;
+     
+            else
+            {
+                a[i+1][j+1]=a[i+1][j]>a[i][j+1]?a[i+1][j]:a[i+1][j];
+            }
+        }
+    }
+    printf("Length:%d",a[n][m]);
+}
+void main()
+{
+    char c1[]="abcd";
+    char c2[]="abc";
+    int m=strlen(c1);
+    int n=strlen(c2);
+    lcs(c1,c2,m,n);
+}       
+
+*******reverse string**********
+
+#include<stdio.h>
+#include<stdlib.h>
+#include<string.h>
+void * reversestring(char *s)
+{
+    int n=strlen(s);
+    int k=0,top=-1;
+    char ch;
+    char stack[n];
+    char *r=malloc(n+1);
+    for(int i=n-1;i>=0;i--)
+    {
+        ch=s[i];
+        if(ch!=' ')
+        {
+            stack[++top]=ch;
+        }
+        else if(ch==' ' && top!=-1)
+        {
+            while(top>=0)
+            {
+                r[k]=stack[top];
+                k++;
+                top--;
+            }
+            r[k++]=' ';
+        }
+    }
+    if(top!=-1)
+    {
+        while(top>=0)
+        {
+            if(stack[top]!=' ')
+            {
+                r[k]=stack[top];
+                k++;
+                top--;
+            }
+        }
+    }
+    if(s[0]==' ')
+    {
+        r[k-1]='\0';
+    }
+    r[k]='\0';
+    printf("%s",r);
+    return r;
+}
+int main()
+{
+    char a[100]="  we   are   indians  ";
+    reversestring(a);
+}
+
+*********NQueens***********
+
+#include<stdio.h>
+#include<stdlib.h>
+int place(int k,int i,int x[])
+{
+    for(int j=0;j<=k-1;j++)
+       if(x[j]==i || abs(j-k)==abs(x[j]-i))
+         return 0;
+    return 1;
+}
+void NQueens(int k,int n,int x[])
+{
+    for(int i=0;i<n;i++)
+    {
+        if(place(k,i,x))
+        {
+            x[k]=i;
+            if(k==n-1){
+                for(int j=0;j<n;j++)  
+                 printf("%d ",x[j]+1);
+                 printf("\n");}
+            else
+              NQueens(k+1,n,x);
+        }
+    }
+}
+void main()
+{
+   
+    int x[8];
+    for(int i=0;i<8;i++)
+      x[i]=1;
+      NQueens(0,8,x);
+}
+
+********Uniquepaths**************
+
+#include<stdio.h>
+int uniquePaths(int m, int n){
+    int a[m][n];
+    if(m==0 && n==0)
+        return 0;
+    for(int i=0;i<m;i++)
+    {
+        for(int j=0;j<n;j++)
+        {
+            if(j==n-1 & i==m-1)
+                a[i][j]=0;
+            if(j==n-1|| i==m-1)
+                a[i][j]=1;
+            else
+                a[i][j]=0;
+        }
+    }
+    for(int i=m-2;i>=0;i--)
+    {
+        for(int j=n-2;j>=0;j--)
+        {
+            a[i][j]=a[i][j+1]+a[i+1][j];
+        }
+    }
+    return a[0][0];
+}
+void main()
+{
+int m,n;
+printf("enter number of rows in grid");
+scanf("%d",&m);
+printf("enter number of columns in grid");
+scanf("%d",&n);
+int r=uniquePaths(m,n);
+printf("Number of Unique Paths: %d",r);
+}
+
+*********quicksort***********
+
+#include<stdio.h>
+#include<stdlib.h>
+int split(int a[],int l,int r)
+{
+    int i=0,j=0,pivot;
+    i=l;
+    j=r;
+    pivot=a[i];
+    while(i<j)
+    {
+        while(a[i]<pivot)
+        {
+            i--;
+        }
+        while(a[j]>pivot)
+        {
+            j--;
+        }
+        if(i<j)
+        {
+            int temp;
+            temp=a[j];
+            a[j]=a[i];
+            a[i]=temp;
+           
+        }
+    }
+        if(a[j]>pivot)
+        {
+            int p;
+            p=a[j];
+            a[j]=pivot;
+            pivot=p;
+        }
+    return j;
+}
+int quicksort(int a[],int l,int r)
+{
+    int p;
+    if(l<r)
+    {
+        p=split(a,l,r);
+        quicksort(a,l,p);
+        quicksort(a,p+1,r);
+       
+    }
+}
+int main ()
+{
+  int a[100], n, i;
+  printf ("enter size of array: ");
+  scanf ("%d", &n);
+  printf ("enter array elements");
+  for (i = 0; i < n; i++) {
+      scanf ("%d", &a[i]);
+    }
+  quicksort (a,0,n-1);
+  printf ("after sorting:\n");
+  for (i = 0; i < n; i++){
+    printf ("%d\t", a[i]);}
+}
+
+************mergesort************
+
+
+#include<stdio.h>
+void merge(int *nums1,int nums1size,int m,int *nums2,int nums2size,int n)
+{
+    int i=0,j=0,k=0;
+    int a[m+n];
+    while(i!=m  && j!=n)
+    {
+        if(nums1[i]<nums2[j])
+        {
+            a[k]=nums1[i];
+            i++;
+            k++;
+        }
+        else if(nums1[i]>nums2[j])
+        {
+            a[k]=nums2[j];
+            j++;
+            k++;
+        }
+        else
+        {
+            a[k]=nums1[i];
+            k++;
+            i++;
+            a[k]=nums2[j];
+            j++;
+            k++;
+        }
+    }
+    if(i==m)
+    {
+        while(j!=n)
+        {
+            a[k]=nums2[j];
+            k++;
+            j++;
+        }
+    }
+    if(j==n)
+    {
+        while(i!=m)
+        {
+            a[k]=nums1[i];
+            k++;
+            i++;
+        }
+    }
+    for(i=0;i<(m+n);i++)
+    {
+        nums1[i]=a[i];
+    }
+   
+}
+void main()
+{
+int m,n;
+printf("enter number of elements in nums1:");
+scanf("%d",&m);
+printf("enter number of elements in nums2:");
+scanf("%d",&n);
+int nums1[m+n],nums2[n];
+printf("enter elements in nums1 in sorted order");
+for(int i=0;i<m;i++)
+{
+scanf("%d",&nums1[i]);
+}
+printf("enter elements in nums2 in sorted order");
+for(int i=0;i<n;i++)
+{
+scanf("%d",&nums2[i]);
+}
+merge(&nums1[0],sizeof(nums1)/sizeof(int),m,&nums2[0],sizeof(nums2)/sizeof(int),n);
+printf("[");
+for(int i=0;i<(m+n);i++)
+{
+printf("%d,",nums1[i]);
+}
+printf("]");
+}
+Show quoted text
